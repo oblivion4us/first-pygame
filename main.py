@@ -31,7 +31,7 @@ double_score_bonus = False
 
 # Инициализация времени и рейтинга
 start_time = time.time()
-game_duration = 40  # 40 секунд
+game_duration = 30  # 30 секунд
 scores = []
 
 def get_nickname():
@@ -75,6 +75,8 @@ while running:
 
     # Проверка времени игры
     elapsed_time = current_time - start_time
+    remaining_time = max(0, game_duration - elapsed_time)  # Оставшееся время
+
     if elapsed_time > game_duration:
         nickname = get_nickname()
         scores.append((nickname, score))
@@ -108,6 +110,11 @@ while running:
 
     score_text = font.render(f"Очки: {score}", True, (0, 0, 0))
     screen.blit(score_text, (10, 10))
+
+    # Отображение оставшегося времени сверху по центру
+    timer_text = font.render(f"Время: {int(remaining_time)}", True, (0, 0, 0))
+    timer_rect = timer_text.get_rect(center=(SCREEN_WIDTH / 2, 20))
+    screen.blit(timer_text, timer_rect)
 
     if double_score_bonus:
         bonus_text = font.render("x2", True, (255, 0, 0))
