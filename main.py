@@ -17,9 +17,6 @@ target_img = pygame.image.load("images/targetimg1.png")
 target_width = 50
 target_height = 50
 
-target_x = random.randint(0, SCREEN_WIDTH - target_width)
-target_y = random.randint(0, SCREEN_HEIGHT - target_height)
-
 color = (220, 220, 220)
 
 score = 0
@@ -30,7 +27,6 @@ last_hit_time = time.time()
 double_score_bonus = False
 
 # Инициализация времени и рейтинга
-start_time = time.time()
 game_duration = 30  # 30 секунд
 scores = []
 
@@ -68,58 +64,93 @@ def show_scoreboard(scores):
     pygame.display.flip()
     time.sleep(5)  # Держим окно 5 секунд
 
-running = True
-while running:
-    screen.fill(color)
-    current_time = time.time()
+def main_game():
+    global score, hit_count, double_score_bonus, last_hit_time
+    score = 0
+    hit_count = 0
+    double_score_bonus = False
+    last_hit_time = time.time()
 
-    # Проверка времени игры
-    elapsed_time = current_time - start_time
-    remaining_time = max(0, game_duration - elapsed_time)  # Оставшееся время
+    target_x = random.randint(0, SCREEN_WIDTH - target_width)
+    target_y = random.randint(0, SCREEN_HEIGHT - target_height)
 
-    if elapsed_time > game_duration:
-        nickname = get_nickname()
-        scores.append((nickname, score))
-        show_scoreboard(scores)
-        running = False
-        continue
+    start_time = time.time()
+    running = True
+    while running:
+        screen.fill(color)
+        current_time = time.time()
 
-    # Сброс счетчика попаданий если прошла секунда
-    if current_time - last_hit_time >= 1:
-        hit_count = 0
-        double_score_bonus = False
+        # Проверка времени игры
+        elapsed_time = current_time - start_time
+        remaining_time = max(0, game_duration - elapsed_time)  # Оставшееся время
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if elapsed_time > game_duration:
+            nickname = get_nickname()
+            scores.append((nickname, score))
+            show_scoreboard(scores)
             running = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_x, mouse_y = pygame.mouse.get_pos()
-            if target_x < mouse_x < target_x + target_width and target_y < mouse_y < target_y + target_height:
-                target_x = random.randint(0, SCREEN_WIDTH - target_width)
-                target_y = random.randint(0, SCREEN_HEIGHT - target_height)
-                hit_count += 1
-                last_hit_time = current_time
+            continue
 
-                if hit_count > 5:
-                    score += 2  # Удвоение очков
-                    double_score_bonus = True
-                else:
-                    score += 1
+        # Сброс счетчика попаданий если прошла секунда
+        if current_time - last_hit_time >= 1:
+            hit_count = 0
+            double_score_bonus = False
 
-    screen.blit(target_img, (target_x, target_y))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                if target_x < mouse_x < target_x + target_width and target_y < mouse_y < target_y + target_height:
+                    target_x = random.randint(0, SCREEN_WIDTH - target_width)
+                    target_y = random.randint(0, SCREEN_HEIGHT - target_height)
+                    hit_count += 1
+                    last_hit_time = current_time
 
-    score_text = font.render(f"Очки: {score}", True, (0, 0, 0))
-    screen.blit(score_text, (10, 10))
+                    if hit_count > 5:
+                        score += 2  # Удвоение очков
+                        double_score_bonus = True
+                    else:
+                        score += 1
 
-    # Отображение оставшегося времени сверху по центру
-    timer_text = font.render(f"Время: {int(remaining_time)}", True, (0, 0, 0))
-    timer_rect = timer_text.get_rect(center=(SCREEN_WIDTH / 2, 20))
-    screen.blit(timer_text, timer_rect)
+        screen.blit(target_img, (target_x, target_y))
 
-    if double_score_bonus:
-        bonus_text = font.render("x2", True, (255, 0, 0))
-        screen.blit(bonus_text, (10, 40))
+        score_text = font.render(f"Очки: {score}", True, (0, 0, 0))
+        screen.blit(score_text, (10, 10))
 
-    pygame.display.update()
+        # Отображение оставшегося времени сверху по центру
+        timer_text = font.render(f"Время: {int(remaining_time)}", True, (0, 0, 0))
+        timer_rect = timer_text.get_rect(center=(SCREEN_WIDTH / 2, 20))
+        screen.blit(timer_text, timer_rect)
+
+        if double_score_bonus:
+            bonus_text = font.render("x2", True, (255, 0, 0))
+            screen.blit(bonus_text, (10, 40))
+
+        pygame.display.update()
+
+def start_screen():
+    button_font = pygame.font.Font(None, 74)
+    button_text = button_font.render("Начать", True, (0, 0, 0))  # Цвет шрифта черный
+    button_rect = button_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
+
+    running = True
+    while running:
+        screen.fill((220, 220, 220))  # Цвет фона серый (220, 220, 220)
+        pygame.draw.rect(screen, (128, 0, 0), button_rect.inflate(20, 20))  # Цвет фона кнопки бордовый (128, 0, 0)
+        screen.blit(button_text, button_rect)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if button_rect.collidepoint(event.pos):
+                    running = False
+
+        pygame.display.flip()
+
+start_screen()
+main_game()
 
 pygame.quit()
