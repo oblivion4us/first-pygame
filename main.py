@@ -1,6 +1,7 @@
 import random
 import pygame
 import time
+import sys
 
 pygame.init()
 
@@ -16,10 +17,10 @@ target_img = pygame.image.load("images/targetimg1.png")
 target_width = 50
 target_height = 50
 
-target_x = random.randint(0, SCREEN_WIDTH-target_width)
-target_y = random.randint(0, SCREEN_HEIGHT-target_height)
+target_x = random.randint(0, SCREEN_WIDTH - target_width)
+target_y = random.randint(0, SCREEN_HEIGHT - target_height)
 
-color = (220,220,220)
+color = (220, 220, 220)
 
 score = 0
 font = pygame.font.Font(None, 36)
@@ -28,10 +29,58 @@ hit_count = 0
 last_hit_time = time.time()
 double_score_bonus = False
 
+# Инициализация времени и рейтинга
+start_time = time.time()
+game_duration = 40  # 40 секунд
+scores = []
+
+def get_nickname():
+    """Функция для ввода никнейма."""
+    nickname = ''
+    input_active = True
+    while input_active:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    input_active = False
+                elif event.key == pygame.K_BACKSPACE:
+                    nickname = nickname[:-1]
+                else:
+                    nickname += event.unicode
+            elif event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        screen.fill((255, 255, 255))
+        text_surface = font.render(f'Введите ваш никнейм: {nickname}', True, (0, 0, 0))
+        screen.blit(text_surface, (50, SCREEN_HEIGHT / 3))
+        pygame.display.flip()
+    return nickname
+
+def show_scoreboard(scores):
+    """Функция для отображения таблицы лидеров."""
+    screen.fill((255, 255, 255))
+    scores.sort(key=lambda x: x[1], reverse=True)  # Сортировка по убыванию очков
+    for i, (nickname, score) in enumerate(scores):
+        text_surface = font.render(f'{i + 1}. {nickname}: {score}', True, (0, 0, 0))
+        screen.blit(text_surface, (50, 50 + i * 30))
+
+    pygame.display.flip()
+    time.sleep(5)  # Держим окно 5 секунд
+
 running = True
 while running:
     screen.fill(color)
     current_time = time.time()
+
+    # Проверка времени игры
+    elapsed_time = current_time - start_time
+    if elapsed_time > game_duration:
+        nickname = get_nickname()
+        scores.append((nickname, score))
+        show_scoreboard(scores)
+        running = False
+        continue
 
     # Сброс счетчика попаданий если прошла секунда
     if current_time - last_hit_time >= 1:
@@ -65,6 +114,5 @@ while running:
         screen.blit(bonus_text, (10, 40))
 
     pygame.display.update()
-
 
 pygame.quit()
