@@ -26,8 +26,7 @@ hit_count = 0
 last_hit_time = time.time()
 double_score_bonus = False
 
-# Инициализация времени и рейтинга
-game_duration = 30  # 30 секунд
+game_duration = 30
 scores = []
 
 def get_nickname():
@@ -56,13 +55,13 @@ def get_nickname():
 def show_scoreboard(scores):
     """Функция для отображения таблицы лидеров."""
     screen.fill((255, 255, 255))
-    scores.sort(key=lambda x: x[1], reverse=True)  # Сортировка по убыванию очков
+    scores.sort(key=lambda x: x[1], reverse=True)
     for i, (nickname, score) in enumerate(scores):
         text_surface = font.render(f'{i + 1}. {nickname}: {score}', True, (0, 0, 0))
         screen.blit(text_surface, (50, 50 + i * 30))
 
     pygame.display.flip()
-    time.sleep(5)  # Держим окно 5 секунд
+    time.sleep(5)
 
 def main_game():
     global score, hit_count, double_score_bonus, last_hit_time
@@ -80,9 +79,8 @@ def main_game():
         screen.fill(color)
         current_time = time.time()
 
-        # Проверка времени игры
         elapsed_time = current_time - start_time
-        remaining_time = max(0, game_duration - elapsed_time)  # Оставшееся время
+        remaining_time = max(0, game_duration - elapsed_time)
 
         if elapsed_time > game_duration:
             nickname = get_nickname()
@@ -91,7 +89,6 @@ def main_game():
             running = False
             continue
 
-        # Сброс счетчика попаданий если прошла секунда
         if current_time - last_hit_time >= 1:
             hit_count = 0
             double_score_bonus = False
@@ -108,7 +105,7 @@ def main_game():
                     last_hit_time = current_time
 
                     if hit_count > 5:
-                        score += 2  # Удвоение очков
+                        score += 2
                         double_score_bonus = True
                     else:
                         score += 1
@@ -118,7 +115,6 @@ def main_game():
         score_text = font.render(f"Очки: {score}", True, (0, 0, 0))
         screen.blit(score_text, (10, 10))
 
-        # Отображение оставшегося времени сверху по центру
         timer_text = font.render(f"Время: {int(remaining_time)}", True, (0, 0, 0))
         timer_rect = timer_text.get_rect(center=(SCREEN_WIDTH / 2, 20))
         screen.blit(timer_text, timer_rect)
@@ -131,13 +127,13 @@ def main_game():
 
 def start_screen():
     button_font = pygame.font.Font(None, 74)
-    button_text = button_font.render("Начать", True, (0, 0, 0))  # Цвет шрифта черный
+    button_text = button_font.render("Начать", True, (0, 0, 0))
     button_rect = button_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
 
     running = True
     while running:
         screen.fill((220, 220, 220))  # Цвет фона серый (220, 220, 220)
-        pygame.draw.rect(screen, (128, 0, 0), button_rect.inflate(20, 20))  # Цвет фона кнопки бордовый (128, 0, 0)
+        pygame.draw.rect(screen, (128, 0, 0), button_rect.inflate(20, 20))
         screen.blit(button_text, button_rect)
 
         for event in pygame.event.get():
