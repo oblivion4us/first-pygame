@@ -20,6 +20,9 @@ target_y = random.randint(0, SCREEN_HEIGHT-target_height)
 
 color = (220,220,220)
 
+score = 0
+font = pygame.font.Font(None, 36)
+
 running = True
 while running:
     screen.fill(color)
@@ -31,7 +34,12 @@ while running:
             if target_x < mouse_x < target_x+target_width and target_y < mouse_y < target_y+target_height:
                 target_x = random.randint(0, SCREEN_WIDTH - target_width)
                 target_y = random.randint(0, SCREEN_HEIGHT - target_height)
+                score += 1
     screen.blit(target_img, (target_x, target_y))
+
+    score_text = font.render(f"Очки: {score}", True, (0, 0, 0))
+    screen.blit(score_text, (10, 10))
+
     pygame.display.update()
 
 
