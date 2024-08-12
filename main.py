@@ -55,13 +55,19 @@ def get_nickname():
 def show_scoreboard(scores):
     """Функция для отображения таблицы лидеров."""
     screen.fill((255, 255, 255))
-    scores.sort(key=lambda x: x[1], reverse=True)
+    scores.sort(key=lambda x: x[1], reverse=True)  # Сортировка по убыванию очков
     for i, (nickname, score) in enumerate(scores):
         text_surface = font.render(f'{i + 1}. {nickname}: {score}', True, (0, 0, 0))
         screen.blit(text_surface, (50, 50 + i * 30))
 
     pygame.display.flip()
-    time.sleep(5)
+
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
 
 def main_game():
     global score, hit_count, double_score_bonus, last_hit_time
